@@ -7,7 +7,7 @@ var app     = express();
 
 
 //url = 'http://shop.monkeymoto.com/eshopprod_cat_9911-42373_prodtree_f2-028-0235-021482_product_2387149.ACERBIS_OFFROAD_SKID_PLATES.htm';
-url = 'http://shop.monkeymoto.com/eshopprod_cat_9881-115046_prodtree_f2-028-0235-021482_product_2243143.WORKS_CONNECTION_ALUMINUM_CALIPER_GUARDS.htm';
+//url = 'http://shop.monkeymoto.com/eshopprod_cat_9881-115046_prodtree_f2-028-0235-021482_product_2243143.WORKS_CONNECTION_ALUMINUM_CALIPER_GUARDS.htm';
 
 function scrap_product(url_product) {
 
@@ -17,7 +17,8 @@ function scrap_product(url_product) {
 
       var title, release, rating;
 
-      var jsonproduct = { name : "", info1 : "", info2 : "", cat1 : "", cat2 : "", cat3 : "", manufacturercode : "", thumb : [], variation : []};
+      var jsonproduct = { name : "", info1 : "", info2 : "", cat1 : "", cat2 : "", cat3 : "", manufacturercode : "", thumb : [], variation : [], errocode : 0, error : "" };
+
 
       jsonproduct.name = $('#stripeOuter > div > h4').text().trim();
 
@@ -28,8 +29,10 @@ function scrap_product(url_product) {
       jsonproduct.cat3 = $('#youSelectedItem > a:nth-child(4)').text().trim();
       jsonproduct.manufacturercode = $('#margin0 > div > div.stripeInner.innerShadow > div > form > div > input[name="ManufacturerCode"]').first().val();
   
-
-      // #margin0 > div > div.stripeInner.innerShadow > div > form > div > input[type="hidden"]:nth-child(10)
+      if ( jsonproduct.name.length < 1) {
+        jsonproduct.error = url_product;  
+        jsonproduct.errocode = 1;
+      }
 
       $('#margin0 > div > div.stripeInner.innerShadow > div > form > div').filter(function(){
 
@@ -55,7 +58,6 @@ function scrap_product(url_product) {
         
           jsonproduct.thumb.push(data.attr('src'));
 
-          //console.log(thumb);
       });
 
       console.log(jsonproduct);
@@ -64,7 +66,7 @@ function scrap_product(url_product) {
 
     //fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
     //fs.appendFile('output.json', JSON.stringify(arr), function(err){
-    fs.appendFile('output.json', ',' + JSON.stringify(jsonproduct), function(err){
+    fs.appendFile('db_products.json', ',' + JSON.stringify(jsonproduct), function(err){
       console.log('File successfully written! - Check your project directory for the output.json file');
     });
 
@@ -72,10 +74,13 @@ function scrap_product(url_product) {
 
 } /* scrap_product */
 
-scrap_product(url);
 
-//http://shop.monkeymoto.com/catalog_items.asp?prodtree=f2-024-0215-02857
-
+console.log( 'First param must be URL_TO_PRODUCT' );
+console.log( process.argv[2] );
+//appendFile writeFile
+fs.writeFile('db_products.json', '', function(err) {
+  scrap_product( process.argv[2] );
+});
 
 
 console.log('scraping, please wait');

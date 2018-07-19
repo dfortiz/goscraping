@@ -14,7 +14,7 @@ module.exports = {
 
         var title, release, rating;
 
-        var jsonproduct = { name : "", info1 : "", info2 : "", cat1 : "", cat2 : "", cat3 : "", manufacturercode : "", thumb : [], variation : []};
+        var jsonproduct = { name : "", info1 : "", info2 : "", cat1 : "", cat2 : "", cat3 : "", manufacturercode : "", thumb : [], variation : [], errocode : 0, error : "" };
 
         jsonproduct.name = $('#stripeOuter > div > h4').text().trim();
 
@@ -25,6 +25,10 @@ module.exports = {
         jsonproduct.cat3 = $('#youSelectedItem > a:nth-child(4)').text().trim();
         jsonproduct.manufacturercode = $('#margin0 > div > div.stripeInner.innerShadow > div > form > div > input[name="ManufacturerCode"]').first().val();
     
+        if ( jsonproduct.name.length < 1) {
+          jsonproduct.error = url_product;  
+          jsonproduct.errocode = 1;
+        }
 
         // #margin0 > div > div.stripeInner.innerShadow > div > form > div > input[type="hidden"]:nth-child(10)
 
@@ -55,15 +59,18 @@ module.exports = {
             //console.log(thumb);
         });
 
-        console.log(jsonproduct);
+        //console.log(jsonproduct);
 
       }
 
       //fs.writeFile('output.json', JSON.stringify(json, null, 4), function(err){
       //fs.appendFile('output.json', JSON.stringify(arr), function(err){
-      fs.writeFile('output.json', JSON.stringify(jsonproduct), function(err){
-        console.log('File successfully written! - Check your project directory for the output.json file');
-      });
+      var sjson = JSON.stringify(jsonproduct);
+      if ( sjson !== undefined) {
+        fs.appendFile('db_products.json', ',' + sjson, function(err){
+          console.log('File successfully written! - Check your project directory for the output.json file');
+        });      
+      }
 
     });
 
